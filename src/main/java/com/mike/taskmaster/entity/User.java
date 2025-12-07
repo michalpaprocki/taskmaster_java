@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String name;
@@ -29,4 +29,31 @@ public class User {
 
     @ManyToMany(mappedBy = "assignees", cascade = CascadeType.PERSIST)
     private List<Task> tasks;
+
+    protected User(){}
+
+    public User(String name, String email){
+        this.email = email;
+        this.name = name;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    
+    public List<Organization> getOrganizations() {
+        return organizations;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
 }
