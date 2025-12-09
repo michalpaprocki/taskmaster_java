@@ -3,13 +3,13 @@ package com.mike.taskmaster.entity;
 import java.util.UUID;
 import java.util.List;
 
-import jakarta.persistence.*;;
+import jakarta.persistence.*;
 
 
 @Entity
 @Table(name = "tasks")
 public class Task {
-    
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -29,4 +29,28 @@ public class Task {
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> assignees;
-}
+
+        
+    protected Task() {
+        
+    }
+    public UUID getId() {
+        return  id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public User getMaster() {
+        return master;
+    }
+
+    public List<User> getAssignees() {
+        return assignees;
+    }
+ }

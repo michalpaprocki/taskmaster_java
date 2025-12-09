@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 @Table(name = "organizations")
 public class Organization {
     
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -23,4 +24,24 @@ public class Organization {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+
+    protected Organization() {
+        
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
 }
