@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -14,9 +15,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false, unique = true)
     private String name;
-
-    @Column(unique = true)
+    
+    @Column(nullable = false, unique = true)
     private String email;
 
     @ManyToMany

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import com.mike.taskmaster.repository.UserRepository;
+import com.mike.taskmaster.dto.UserDTO;
 import com.mike.taskmaster.entity.User;
 @Service
 public class UserService {
@@ -14,18 +15,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(String name, String email) {
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        } 
-        if(name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be empty");
-        }
-        if (userRepository.existsByEmail(email)) {
+    public User createUser(UserDTO userDto) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new IllegalArgumentException("Email already taken");
         }
 
-        User user = new User(name, email);
+        User user = new User(userDto.getName(), userDto.getEmail());
         return userRepository.save(user);
     }
     public User getUser(UUID id) {

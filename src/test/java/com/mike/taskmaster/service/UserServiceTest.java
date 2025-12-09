@@ -2,7 +2,7 @@ package com.mike.taskmaster.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,6 +15,7 @@ import java.util.UUID;
 
 
 import com.mike.taskmaster.repository.UserRepository;
+import com.mike.taskmaster.dto.UserDTO;
 import com.mike.taskmaster.entity.User;
 
 
@@ -34,16 +35,18 @@ public class UserServiceTest {
     private User jane;
 
     @BeforeEach
-    void cleanAndSetupDb(TestInfo testInfo){
+    void cleanAndSetupDb(){
 
-        jane = new User("jane", "jane@example.com");
+        UserDTO janeDTO = new UserDTO("jane", "jane@example.com");
 
-        userRepository.save(jane);
+        
+        this.jane = userService.createUser(janeDTO);
     }
 
     @Test
     void testCreateUser() {
-        User user = userService.createUser("tony", "tony@example.com");
+        UserDTO dto = new UserDTO("tony", "tony@example.com");
+        User user = userService.createUser(dto);
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("tony");
         assertThat(user.getEmail()).isEqualTo("tony@example.com");
@@ -52,8 +55,8 @@ public class UserServiceTest {
 
     @Test
     void testDuplicateEmailThrows() {
-
-        assertThatThrownBy(()-> userService.createUser("tony", jane.getEmail())).isInstanceOf(IllegalArgumentException.class).hasMessage("Email already taken");
+        UserDTO dto = new UserDTO("tony", jane.getEmail());
+        assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Email already taken");
     }
 
     @Test
