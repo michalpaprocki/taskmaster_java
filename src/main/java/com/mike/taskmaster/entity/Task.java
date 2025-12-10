@@ -1,6 +1,7 @@
 package com.mike.taskmaster.entity;
 
 import java.util.UUID;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -19,8 +20,8 @@ public class Task {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "master_id")
-    private User master;
+    @JoinColumn(name = "creator_id")
+    private User creator;
 
     @ManyToMany
     @JoinTable(
@@ -28,7 +29,7 @@ public class Task {
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> assignees;
+    private List<User> assignees = new ArrayList<>();
 
         
     protected Task() {
@@ -46,8 +47,8 @@ public class Task {
         return description;
     }
 
-    public User getMaster() {
-        return master;
+    public User getCreator() {
+        return creator;
     }
 
     public List<User> getAssignees() {
