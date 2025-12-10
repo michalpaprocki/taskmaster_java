@@ -2,6 +2,7 @@ package com.mike.taskmaster.entity;
 
 
 import java.util.UUID;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -17,12 +18,8 @@ public class Organization {
 
     private String name;
 
-    @ManyToMany(mappedBy = "organizations", fetch = FetchType.LAZY)
-    private List<User> users;
-
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Membership> memberships = new ArrayList<>();
 
 
     protected Organization() {
@@ -37,11 +34,8 @@ public class Organization {
         return name;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public User getOwner() {
-        return owner;
+    public void addMembership(Membership membership) {
+    memberships.add(membership);
+    membership.setOrganization(this);
     }
 }
