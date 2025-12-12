@@ -16,6 +16,7 @@ public class Organization {
     @GeneratedValue
     private UUID id;
 
+    @Column(unique = true)
     private String name;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -25,6 +26,9 @@ public class Organization {
     protected Organization() {
         
     }
+    public Organization(String name) {
+        this.name = name;
+    }
 
     public UUID getId() {
         return id;
@@ -33,9 +37,22 @@ public class Organization {
     public String getName() {
         return name;
     }
-
     public void addMembership(Membership membership) {
-    memberships.add(membership);
-    membership.setOrganization(this);
+        memberships.add(membership);
+        membership.setOrganization(this);
     }
+    public void removeMembership(Membership membership) {
+        memberships.remove(membership);
+        membership.setOrganization(this);
+    }
+    public List<Membership> getMemberships() {
+        return memberships;
+    }
+    public List<Membership> getOwners() {
+        return memberships.stream().filter(m -> m.getRole() == Membership.Role.OWNER).toList();
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

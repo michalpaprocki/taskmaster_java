@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -21,12 +22,24 @@ import jakarta.persistence.UniqueConstraint;
 })
 public class Membership {
     
+    public enum Role {
+    OWNER,
+    MEMBER
+    }
+    
+    @PrePersist
+    public void prePersist() {
+        if (role == null) {
+            role = Role.MEMBER;
+        }
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "users_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
@@ -39,11 +52,6 @@ public class Membership {
 
     @Column(nullable = false)
     private LocalDateTime joinedAt = LocalDateTime.now();
-
-    public enum Role {
-        OWNER,
-        MEMBER
-    }
 
     public Membership(){}
 
