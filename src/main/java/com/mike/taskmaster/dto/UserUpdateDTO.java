@@ -2,6 +2,8 @@ package com.mike.taskmaster.dto;
 
 import java.util.UUID;
 
+import com.mike.taskmaster.entity.User;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 
@@ -34,7 +36,11 @@ public class UserUpdateDTO {
         this.email = email;
         this.password = password;
     }
-
+    public UserUpdateDTO(User user){
+        this.id = user.getId();
+        this.name = user.getName();
+        this.email = user.getEmail();
+    }
     public UUID getId() {return id;}
     public String getName() {return name;}
     public String getEmail() {return email;}
