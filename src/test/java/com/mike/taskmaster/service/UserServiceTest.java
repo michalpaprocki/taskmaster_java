@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
@@ -21,6 +20,9 @@ import java.util.UUID;
 
 
 import com.mike.taskmaster.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.mike.taskmaster.dto.UserRequestDTO;
 import com.mike.taskmaster.dto.UserUpdateDTO;
 import com.mike.taskmaster.entity.User;
@@ -77,7 +79,7 @@ public class UserServiceTest {
     @Test
     void testMissingUserThrows() {
         UUID id = UUID.randomUUID();
-        assertThatThrownBy(() -> userService.getUser(id)).isInstanceOf(IllegalArgumentException.class).hasMessage("User not found");
+        assertThatThrownBy(() -> userService.getUser(id)).isInstanceOf(EntityNotFoundException.class).hasMessage("User not found");
     }
 
     @Test
@@ -111,6 +113,6 @@ public class UserServiceTest {
         UserUpdateDTO dto = new UserUpdateDTO(jane.getId());
         String responseString = userService.hardDeleteUser(dto);
         assertThat(responseString).isEqualTo("User deleted successfully");
-        assertThatThrownBy(() -> userService.getUser(dto.getId())).isInstanceOf(IllegalArgumentException.class).hasMessage("USer not found");
+        assertThatThrownBy(() -> userService.getUser(dto.getId())).isInstanceOf(EntityNotFoundException.class).hasMessage("User not found");
     }
 }
