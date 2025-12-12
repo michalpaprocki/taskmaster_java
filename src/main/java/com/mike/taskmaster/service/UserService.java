@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import com.mike.taskmaster.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.mike.taskmaster.dto.UserRequestDTO;
 import com.mike.taskmaster.dto.UserUpdateDTO;
 import com.mike.taskmaster.entity.User;
@@ -30,7 +33,7 @@ public class UserService {
         return userRepository.save(user);
     }
     public User getUser(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
         return user;
     }
 
@@ -40,7 +43,7 @@ public class UserService {
     }
 
     public User updateUser(UserUpdateDTO dto) {
-        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         if (dto.getName() != null) 
             user.setName(dto.getName());
         if (dto.getEmail() != null)
@@ -51,7 +54,7 @@ public class UserService {
     }
 
     public String softDeleteUser(UserUpdateDTO dto) {
-        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
@@ -59,7 +62,7 @@ public class UserService {
     }
 
     public String hardDeleteUser(UserUpdateDTO dto) {
-        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         userRepository.delete(user);
         return "User deleted successfully";
     }
