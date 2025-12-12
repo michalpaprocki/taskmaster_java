@@ -82,6 +82,22 @@ public class OrganizationServiceTest {
     }
     
     @Test
+    void testGetOrganizationInternal() {
+        Organization org = organizationService.getOrganizationInternal(wayland);
+        assertThat(org).isNotNull();
+        assertThat(org).isInstanceOf(Organization.class);
+        assertThat(org.getName()).isEqualTo(wayland.getName());
+    }
+
+    @Test
+    void testGetOrganizationExternal() {
+        OrganizationResponseDTO org = organizationService.getOrganizationExternal(wayland);
+        assertThat(org).isNotNull();
+        assertThat(org).isInstanceOf(OrganizationResponseDTO.class);
+        assertThat(org.getName()).isEqualTo(wayland.getName());
+    }
+
+    @Test
     void testAddMemberThrows() {
         organizationService.addMember(wayland, cassandra);
         
@@ -104,7 +120,7 @@ public class OrganizationServiceTest {
 
     @Test
     void testUpdateName() {
-        OrganizationUpdateDTO dto =  organizationService.updateName(wayland, "Yutani");
+        OrganizationResponseDTO dto =  organizationService.updateName(wayland, "Yutani");
         assertThat(dto.getName()).isEqualTo("Yutani");
     }
 

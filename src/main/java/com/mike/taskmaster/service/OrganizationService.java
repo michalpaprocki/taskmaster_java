@@ -25,6 +25,10 @@ public class OrganizationService {
     }
 
     public Organization createOrganizationWithOwner(OrganizationRequestDTO dto, User creator) {
+        if (organizationRepository.existsByName(dto.getName())){
+            throw new IllegalArgumentException("Organization name already taken");
+        }
+        
         Organization org = new Organization(dto.getName());
 
         Membership ownerMembership = new Membership();
@@ -35,14 +39,19 @@ public class OrganizationService {
         return organizationRepository.save(org);       
     }
 
-    public Organization getOrganization(OrganizationUpdateDTO dto) {
+    public Organization getOrganizationInternal(OrganizationUpdateDTO dto) {
         Organization org = organizationRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("Organization not found"));
         return org;
     }
 
+    public OrganizationResponseDTO getOrganizationExternal(OrganizationUpdateDTO dto) {
+        Organization org = organizationRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+        return new OrganizationResponseDTO(org);
+    }
+
 
     public boolean isOwner(OrganizationUpdateDTO orgDto, User user) {
-        Organization org = getOrganization(orgDto);
+        Organization org = getOrganizationInternal(orgDto);
         return org.getMemberships().stream().anyMatch(m -> m.getUser().equals(user) && m.getRole() == Membership.Role.OWNER);
     }
 
@@ -79,7 +88,7 @@ public class OrganizationService {
         }
     }
 
-    public OrganizationUpdateDTO updateName(OrganizationUpdateDTO dto, String name) {
+    public OrganizationResponseDTO updateName(OrganizationUpdateDTO dto, String name) {
         Organization org = organizationRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("Organization not found"));
         if (organizationRepository.existsByName(name)) {
             throw new IllegalArgumentException("Organization name already taken");
@@ -87,6 +96,6 @@ public class OrganizationService {
 
         org.setName(name);
         organizationRepository.save(org);
-        return new OrganizationUpdateDTO(org);
+        return new OrganizationResponseDTO(org);
     }
 }
