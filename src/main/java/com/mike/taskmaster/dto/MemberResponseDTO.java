@@ -8,13 +8,13 @@ public class MemberResponseDTO {
     private UUID id;
     private String name;
     private String email;
-    private String role;
+    private Membership.Role role;
 
     public MemberResponseDTO(Membership membership) {
         this.id = membership.getUser().getId();
         this.name = membership.getUser().getName();
         this.email = membership.getUser().getEmail();
-        this.role = membership.getRole().name();
+        this.role = membership.getRole();
     }
 
     public UUID getId() {
@@ -22,8 +22,9 @@ public class MemberResponseDTO {
     }
     public String getName() {return name;}
     public String getEmail() {return email;}
-    public String getRole() {return role;}
-    public void setRole(UUID id) {
+    public Membership.Role getRole() {return role;}
+
+    public void setId(UUID id) {
         this.id = id;
     }
     public void setName(String name) {
@@ -32,7 +33,7 @@ public class MemberResponseDTO {
     public void setEmail(String email) {
         this.email = email;
     }
-    public void setRole(String role) {
+    public void setRole(Membership.Role role) {
         this.role = role;
     }
 }

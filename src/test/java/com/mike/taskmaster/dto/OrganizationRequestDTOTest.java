@@ -26,7 +26,7 @@ public class OrganizationRequestDTOTest {
 
     @Test
     void testNameMinLength() {
-        OrganizationRequestDTO dto = new OrganizationRequestDTO("Wa");
+        OrganizationRequestDTO dto = new OrganizationRequestDTO("Wa", OrganizationRequestDTO.Action.ADD);
         Set<ConstraintViolation<OrganizationRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).anyMatch(v -> 
             v.getPropertyPath().toString().equals("name") && 
@@ -35,7 +35,7 @@ public class OrganizationRequestDTOTest {
 
     @Test
     void testNameNotBlank() {
-        OrganizationRequestDTO dto = new OrganizationRequestDTO("");
+        OrganizationRequestDTO dto = new OrganizationRequestDTO("", OrganizationRequestDTO.Action.ADD);
         Set<ConstraintViolation<OrganizationRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).anyMatch(v -> 
             v.getPropertyPath().toString().equals("name") && 
@@ -44,7 +44,7 @@ public class OrganizationRequestDTOTest {
 
     @Test
     void testValidDTO() {
-        OrganizationRequestDTO dto = new OrganizationRequestDTO("Wayland");
+        OrganizationRequestDTO dto = new OrganizationRequestDTO("Wayland", OrganizationRequestDTO.Action.ADD);
         Set<ConstraintViolation<OrganizationRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).isEmpty();
     }

@@ -18,7 +18,6 @@ import java.util.Set;
 
 public class UserRequestDTOTest {
     private Validator validator;
- 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -27,7 +26,7 @@ public class UserRequestDTOTest {
 
     @Test
     void testNameMinLength() {
-        UserRequestDTO dto = new UserRequestDTO("to", "tom@example.com", "Amazing");
+        UserRequestDTO dto = new UserRequestDTO("to", "tom@example.com", "Amazing", null);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).anyMatch(v -> 
             v.getPropertyPath().toString().equals("name") && 
@@ -36,7 +35,7 @@ public class UserRequestDTOTest {
 
     @Test
     void testEmailPattern() {
-        UserRequestDTO dto = new UserRequestDTO("tom", "tom#example", "Amazing");
+        UserRequestDTO dto = new UserRequestDTO("tom", "tom#example", "Amazing", null);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).anyMatch(v ->
             v.getPropertyPath().toString().equals("email") &&
@@ -45,7 +44,7 @@ public class UserRequestDTOTest {
 
     @Test
     void testPasswordPattern() {
-        UserRequestDTO dto = new UserRequestDTO("tom", "tom@example.com", "mazing");
+        UserRequestDTO dto = new UserRequestDTO("tom", "tom@example.com", "mazing", null);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).anyMatch(v -> 
             v.getPropertyPath().toString().equals("password") && 
@@ -54,7 +53,7 @@ public class UserRequestDTOTest {
 
     @Test
     void testValidDTO() {
-        UserRequestDTO dto = new UserRequestDTO("tom", "tom@example.com", "Amazing");
+        UserRequestDTO dto = new UserRequestDTO("tom", "tom@example.com", "Amazing", null);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dto);
         assertThat(violations).isEmpty();
     }

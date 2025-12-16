@@ -9,6 +9,7 @@ public class UserRequestDTO {
     
     public static final String NAME_MIN_MSG = "Name must be at least 3 characters long";
     public static final String NAME_REQUIRED_MSG = "Name is required";
+    public static final String ID_REQUIRED_MSG = "Id is required";
     public static final String EMAIL_REQUIRED_MSG = "Email is required";
     public static final String EMAIL_INVALID_MSG = "Email must be valid";
     public static final String PASSWORD_REQUIRED_MSG = "Password is required";
@@ -29,12 +30,15 @@ public class UserRequestDTO {
     )
     private String password;
 
+    private Boolean isDeleted;
+
     public UserRequestDTO() {}
 
-    public UserRequestDTO(String name, String email, String password) {
+    public UserRequestDTO(String name, String email, String password, Boolean isDeleted) {
         this.name = name;
         this.email = email;
         this.password = password;
+            this.isDeleted = isDeleted != null ? isDeleted : false;
     }
 
     public String getName() {
@@ -49,8 +53,13 @@ public class UserRequestDTO {
         return password;
     }
 
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
     public void setName(String name) {this.name = name;}
     public void setEmail(String email) {this.email = email;}
     public void setPassword(String password) {this.password = password;}
+    public void setIsDeleted(Boolean isDeleted) {this.isDeleted = isDeleted;}
 
 }
