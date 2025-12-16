@@ -3,6 +3,7 @@ package com.mike.taskmaster.entity;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mike.taskmaster.dto.UserRequestDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,12 +55,19 @@ public class User {
     private boolean isDeleted;
     private LocalDateTime deletedAt;
 
-    protected User(){}
+    public User(){}
 
-    public User(String name, String email, String password){
+    public User(String name, String email, String password, Boolean isDeleted){
         this.email = email;
         this.name = name;
         this.password = password;
+        this.isDeleted = false;
+    }
+
+     public User(UserRequestDTO dto){
+        this.email = dto.getEmail();
+        this.name = dto.getName();
+        this.password = dto.getPassword();
     }
 
     public UUID getId() {
@@ -100,7 +108,9 @@ public class User {
         memberships.add(membership);
         membership.setUser(this);
     }
-
+    public void removeMembership(Membership membership) {
+        memberships.remove(membership);
+    }
     public List<Membership> getMemberships() {
         return memberships;
     }

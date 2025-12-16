@@ -23,7 +23,7 @@ public class Organization {
     private List<Membership> memberships = new ArrayList<>();
 
 
-    protected Organization() {
+    public Organization() {
         
     }
     public Organization(String name) {
