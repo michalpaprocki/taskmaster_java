@@ -24,7 +24,6 @@ import com.mike.taskmaster.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 import com.mike.taskmaster.dto.UserRequestDTO;
-import com.mike.taskmaster.dto.UserUpdateDTO;
 import com.mike.taskmaster.entity.User;
 
 
@@ -46,7 +45,7 @@ public class UserServiceTest {
     @BeforeEach
     void cleanAndSetupDb(){
 
-        UserRequestDTO janeDTO = new UserRequestDTO("jane", "jane@example.com", "Amazing");
+        UserRequestDTO janeDTO = new UserRequestDTO("jane", "jane@example.com", "Amazing", null);
 
         
         this.jane = userService.createUser(janeDTO);
@@ -54,7 +53,7 @@ public class UserServiceTest {
 
     @Test
     void testCreateUser() {
-        UserRequestDTO dto = new UserRequestDTO("tony", "tony@example.com", "Amazing");
+        UserRequestDTO dto = new UserRequestDTO("tony", "tony@example.com", "Amazing", null);
         User user = userService.createUser(dto);
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("tony");
@@ -64,13 +63,13 @@ public class UserServiceTest {
 
     @Test
     void testDuplicateEmailThrows() {
-        UserRequestDTO dto = new UserRequestDTO("tony", jane.getEmail(), jane.getPassword());
+        UserRequestDTO dto = new UserRequestDTO("tony", jane.getEmail(), jane.getPassword(),null);
         assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Email already taken");
     }
 
     @Test
     void testGetUser() {
-        User user = userService.getUser(jane.getId());
+        User user = userService.getUserEntity(jane.getId());
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo(jane.getName());
         assertThat(user.getEmail()).isEqualTo(jane.getEmail());
@@ -91,8 +90,8 @@ public class UserServiceTest {
 
     @Test
     void testUserUpdate() {
-        UserUpdateDTO dto = new UserUpdateDTO(jane.getId(), "cassandra", "cassandra@example.com", "my_secr3t_Passwordz");
-        User user = userService.updateUser(dto);
+        UserRequestDTO dto = new UserRequestDTO("cassandra", "cassandra@example.com", "my_secr3t_Passwordz", null);
+        User user = userService.updateUser(jane.getId(), dto);
         assertThat(user.getName()).isEqualTo("cassandra");
         assertThat(user.getEmail()).isEqualTo("cassandra@example.com");
         assertNotEquals(dto.getPassword(), user.getPassword());
@@ -101,18 +100,16 @@ public class UserServiceTest {
 
     @Test
     void testUserSoftDelete() {
-        UserUpdateDTO dto = new UserUpdateDTO(jane.getId());
-        String responseString = userService.softDeleteUser(dto);
+        String responseString = userService.softDeleteUser(jane.getId());
         assertThat(responseString).isEqualTo("User deleted successfully");
-        User user = userService.getUser(dto.getId());
+        User user = userService.getUserEntity(jane.getId());
         assertThat(user).isNotNull();
         assertThat(user.getIsDeleted()).isEqualTo(true);
         assertThat(user.getDeletedAt()).isInstanceOf(LocalDateTime.class);
     }
     void testUserHardDelete() {
-        UserUpdateDTO dto = new UserUpdateDTO(jane.getId());
-        String responseString = userService.hardDeleteUser(dto);
+        String responseString = userService.hardDeleteUser(jane.getId());
         assertThat(responseString).isEqualTo("User deleted successfully");
-        assertThatThrownBy(() -> userService.getUser(dto.getId())).isInstanceOf(EntityNotFoundException.class).hasMessage("User not found");
+        assertThatThrownBy(() -> userService.getUser(jane.getId())).isInstanceOf(EntityNotFoundException.class).hasMessage("User not found");
     }
 }

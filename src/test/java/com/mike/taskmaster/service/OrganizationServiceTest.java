@@ -17,9 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import com.mike.taskmaster.dto.MemberResponseDTO;
 import com.mike.taskmaster.dto.OrganizationRequestDTO;
 import com.mike.taskmaster.dto.OrganizationResponseDTO;
-import com.mike.taskmaster.dto.OrganizationUpdateDTO;
 import com.mike.taskmaster.dto.UserRequestDTO;
-
+import com.mike.taskmaster.entity.Membership;
 import com.mike.taskmaster.entity.Organization;
 import com.mike.taskmaster.entity.User;
 
@@ -40,87 +39,85 @@ public class OrganizationServiceTest {
     private User jane;
     private User frank;
     private User cassandra;
-    private OrganizationUpdateDTO wayland;
+    private OrganizationResponseDTO wayland;
 
     @BeforeEach
     void setUp() {
-        UserRequestDTO dto1 = new UserRequestDTO("jane", "jane@example.com", "my_secr3t_password");
-        UserRequestDTO dto2 = new UserRequestDTO("frank", "frank@example.com", "my_secr3t_password");
-        UserRequestDTO dto3 = new UserRequestDTO("cassandra", "cassandra@example.com", "my_secr3t_password");
+        UserRequestDTO dto1 = new UserRequestDTO("jane", "jane@example.com", "My_secr3t_password", null);
+        UserRequestDTO dto2 = new UserRequestDTO("frank", "frank@example.com", "My_secr3t_password", null);
+        UserRequestDTO dto3 = new UserRequestDTO("cassandra", "cassandra@example.com", "My_secr3t_password", null);
         this.jane = userService.createUser(dto1);
         this.frank = userService.createUser(dto2);
         this.cassandra = userService.createUser(dto3);
 
-        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("Wayland");
+        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("Wayland", null);
    
-        Organization org = organizationService.createOrganizationWithOwner(orgDto, jane);
-        OrganizationUpdateDTO orgUpdateDto = new OrganizationUpdateDTO(org);
-        this.wayland = orgUpdateDto;
+        this.wayland = organizationService.createOrganizationWithOwner(orgDto, jane);
     }
 
     @Test
     void testCreateOrganization() {
-        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("ACME");
-        Organization org = organizationService.createOrganizationWithOwner(orgDto, jane);
+        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("ACME", null);
+        OrganizationResponseDTO org = organizationService.createOrganizationWithOwner(orgDto, jane);
         assertThat(org).isNotNull();
         assertThat(org.getName()).isEqualTo("ACME");
-        assertTrue(org.getOwners().stream().anyMatch(m -> m.getUser().equals(jane)));
+        assertThat(org.getMemberships()).filteredOn(m -> m.getRole() == Membership.Role.OWNER).extracting(MemberResponseDTO::getName).contains(jane.getName());
     }
 
     @Test
     void testIsOwner() {
-        OrganizationUpdateDTO dto = new OrganizationUpdateDTO(wayland.getId());
 
-        assertTrue(organizationService.isOwner(dto, jane));
+        assertTrue(organizationService.isOwner(wayland.getId(), jane));
     }
 
     @Test
-    void testAddMember() {
-        OrganizationResponseDTO orgDto = organizationService.addMember(wayland, cassandra);
-        assertThat(orgDto.getMemberships()).allMatch(m -> m instanceof MemberResponseDTO);
-        assertThat(orgDto.getMemberships()).extracting(m -> m.getName()).contains(cassandra.getName());
-    }
-    
-    @Test
-    void testGetOrganizationInternal() {
-        Organization org = organizationService.getOrganizationInternal(wayland);
-        assertThat(org).isNotNull();
-        assertThat(org).isInstanceOf(Organization.class);
-        assertThat(org.getName()).isEqualTo(wayland.getName());
-    }
-
-    @Test
-    void testGetOrganizationExternal() {
-        OrganizationResponseDTO org = organizationService.getOrganizationExternal(wayland);
+    void testGetOrganization() {
+        OrganizationResponseDTO org = organizationService.getOrganization(wayland.getId());
         assertThat(org).isNotNull();
         assertThat(org).isInstanceOf(OrganizationResponseDTO.class);
         assertThat(org.getName()).isEqualTo(wayland.getName());
     }
+    @Test
+    void testGetOrganizationEntity() {
+        Organization org = organizationService.getOrganizationEntity(wayland.getId());
+        assertThat(org).isNotNull();
+        assertThat(org).isInstanceOf(Organization.class);
+        assertThat(org.getName()).isEqualTo(wayland.getName());
+    }
+    
+    @Test
+    void testAddMember() {
+        OrganizationResponseDTO orgDto = organizationService.addMember(wayland.getId(), cassandra);
+        assertThat(orgDto.getMemberships()).extracting(MemberResponseDTO::getName).contains(cassandra.getName());
+        assertThat(orgDto.getMemberships()).extracting(MemberResponseDTO::getId).doesNotHaveDuplicates();
+        assertThat(orgDto.getMemberships()).filteredOn(m -> m.getRole() == Membership.Role.OWNER);
+    }
+    
 
     @Test
     void testAddMemberThrows() {
-        organizationService.addMember(wayland, cassandra);
+        organizationService.addMember(wayland.getId(), cassandra);
         
-        assertThatThrownBy(() -> organizationService.addMember(wayland, cassandra)).isInstanceOf(IllegalArgumentException.class).hasMessage("User is already a member of this organization");
+        assertThatThrownBy(() -> organizationService.addMember(wayland.getId(), cassandra)).isInstanceOf(IllegalArgumentException.class).hasMessage("User is already a member of this organization");
     }
 
     @Test
     void testRemoveMember() {
-        organizationService.addMember(wayland, cassandra);
+        organizationService.addMember(wayland.getId(), cassandra);
         
-        Boolean isRemoved = organizationService.removeMember(wayland, cassandra);
-        assertTrue(isRemoved);
+        OrganizationResponseDTO org = organizationService.removeMember(wayland.getId(), cassandra);
+        assertThat(org.getMemberships()).extracting(MemberResponseDTO::getName).doesNotContain(cassandra.getName());
     }
 
     @Test
-    void testRemoveMemberFails() {
-        Boolean isRemoved = organizationService.removeMember(wayland, cassandra);
-        assertFalse(isRemoved);
+    void testRemoveMemberThrows() {
+        assertThatThrownBy(() -> organizationService.removeMember(wayland.getId(), cassandra)).isInstanceOf(IllegalArgumentException.class).hasMessage("User is not a member of this organization");
     }
 
     @Test
     void testUpdateName() {
-        OrganizationResponseDTO dto =  organizationService.updateName(wayland, "Yutani");
+        OrganizationRequestDTO dtoReq = new OrganizationRequestDTO("Yutani", null);
+        OrganizationResponseDTO dto =  organizationService.updateName(wayland.getId(), dtoReq);
         assertThat(dto.getName()).isEqualTo("Yutani");
     }
 

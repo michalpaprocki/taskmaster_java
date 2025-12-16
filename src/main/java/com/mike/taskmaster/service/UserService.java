@@ -5,14 +5,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import com.mike.taskmaster.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
 import com.mike.taskmaster.dto.UserRequestDTO;
-import com.mike.taskmaster.dto.UserUpdateDTO;
+import com.mike.taskmaster.dto.UserResponseDTO;
 import com.mike.taskmaster.entity.User;
+import com.mike.taskmaster.mapper.UserMapper;
 @Service
 public class UserService {
     
@@ -29,40 +34,42 @@ public class UserService {
             throw new IllegalArgumentException("Email already taken");
         }
 
-        User user = new User(userDto.getName(), userDto.getEmail(), userDto.getPassword());
+        User user = UserMapper.toEntity(userDto);
         return userRepository.save(user);
     }
-    public User getUser(UUID id) {
+    public UserResponseDTO getUser(UUID id) {
         User user = userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
-        return user;
+        return UserMapper.toResponse(user);
     }
-
+    public User getUserEntity(UUID id) {
+        return userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
+    }
+    public Set<User> getUserEntities(Set<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return ids.stream().map(id -> userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found " + id))).collect(Collectors.toSet());
+    }
     public String getEmail(UUID id) {
-        User user = getUser(id);
-        return user.getEmail();
+        return getUser(id).getEmail();
     }
 
-    public User updateUser(UserUpdateDTO dto) {
-        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
-        if (dto.getName() != null) 
-            user.setName(dto.getName());
-        if (dto.getEmail() != null)
-            user.setEmail(dto.getEmail());
-        if (dto.getPassword() != null)
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+    public User updateUser(UUID id, UserRequestDTO dto) {
+        User user = getUserEntity(id);
+        UserMapper.updateEntity(user, dto, passwordEncoder);
         return userRepository.save(user);
     }
 
-    public String softDeleteUser(UserUpdateDTO dto) {
-        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public String softDeleteUser(UUID id) {
+        User user = getUserEntity(id);
         user.setIsDeleted(true);
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return "User deleted successfully";
     }
 
-    public String hardDeleteUser(UserUpdateDTO dto) {
-        User user = userRepository.findById(dto.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public String hardDeleteUser(UUID id) {
+        User user = getUserEntity(id);
         userRepository.delete(user);
         return "User deleted successfully";
     }
