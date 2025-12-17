@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import com.mike.taskmaster.repository.UserRepository;
 
@@ -48,7 +48,7 @@ public class UserService {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptySet();
         }
-        return ids.stream().map(id -> userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found " + id))).collect(Collectors.toSet());
+        return new HashSet<>(userRepository.findAllById(ids));
     }
     public String getEmail(UUID id) {
         return getUser(id).getEmail();
@@ -71,7 +71,7 @@ public class UserService {
     public String hardDeleteUser(UUID id) {
         User user = getUserEntity(id);
         userRepository.delete(user);
-        return "User deleted successfully";
+        return "User removed successfully";
     }
     
     

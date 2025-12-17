@@ -38,17 +38,31 @@ public class TaskService {
         return task;
     }
 
-    public TaskResponseDTO updateTask(UUID id, TaskRequestDTO dto, User creator, Set<User> assignees) {
+    public boolean isCreator(UUID id, UUID userId) {
         Task task = getTaskEntity(id);
-        
-        TaskMapper.updateEntity(task, dto, creator, assignees);
+        if (task.getCreator().getId().equals(userId)) {
+            return true;
+        } else{
+            return false;
+        }
+    }
+
+    public TaskResponseDTO updateTask(UUID id, TaskRequestDTO dto, User creator, Set<UUID> assignees) {
+        Task task = getTaskEntity(id);
+        if (!isCreator(id, creator.getId())) {
+            throw new IllegalArgumentException("Provided user is not creator of the task");
+        }
+        Set<User> users = userService.getUserEntities(assignees);
+
+        if (users.size() != assignees.size()){
+            throw new IllegalArgumentException("Some users not found");
+        }
+
+        TaskMapper.updateEntity(task, dto, creator, users);
         Task updatedTask = taskRepository.save(task);
         return new TaskResponseDTO(updatedTask);
     }
-    // public TaskResponseDTO softRemoveTask(UUID id, TaskRequestDTO dto) {
-    //     Task task = getTaskEntity(id);
-
-    // }
+    
     public TaskResponseDTO hardRemoveTask(UUID id) {
         Task targetTask = getTaskEntity(id);
         taskRepository.deleteById(id);

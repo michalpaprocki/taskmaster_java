@@ -2,11 +2,13 @@ package com.mike.taskmaster.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.mike.taskmaster.dto.MemberResponseDTO;
 import com.mike.taskmaster.dto.TaskRequestDTO;
 import com.mike.taskmaster.dto.TaskResponseDTO;
 import com.mike.taskmaster.dto.UserRequestDTO;
@@ -77,8 +78,8 @@ public class TaskServiceTest {
     @Test
     void testUpdateTask() {
         LocalDateTime now = LocalDateTime.now();
-        Set<User> assignees = new HashSet<>();
-        assignees.add(frank);
+        Set<UUID> assignees = new HashSet<>();
+        assignees.add(frank.getId());
         TaskRequestDTO dto = new TaskRequestDTO("my new testing title", "Just a new description", null, TaskRequestDTO.Action.ADD, true, Task.Status.CANCELED, now);
         TaskResponseDTO task = taskService.updateTask(mockupTask.getId(), dto, jane, assignees);
         assertThat(task).isNotNull();
@@ -88,5 +89,17 @@ public class TaskServiceTest {
         assertThat(task.getStatus()).isEqualTo(Task.Status.CANCELED);
         assertThat(task.getDeadline()).isEqualTo(now);
         
+    }
+
+    @Test 
+    public void testIsTaskCreator() {
+        boolean isCreator = taskService.isCreator(mockupTask.getId(), jane.getId());
+        assertTrue(isCreator);
+    }
+
+    @Test 
+    public void testIsNotTaskCreator() {
+        boolean isCreator = taskService.isCreator(mockupTask.getId(), UUID.randomUUID());
+        assertFalse(isCreator);
     }
 }
