@@ -115,6 +115,10 @@ public class User {
         return memberships;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
