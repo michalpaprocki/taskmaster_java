@@ -33,9 +33,10 @@ public class UserService {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new IllegalArgumentException("Email already taken");
         }
-
-        User user = UserMapper.toEntity(userDto);
-        return userRepository.save(user);
+        if (userRepository.existsByName(userDto.getEmail())) {
+            throw new IllegalArgumentException("Name already taken");
+        }
+        return userRepository.save(UserMapper.toEntity(userDto));
     }
     public UserResponseDTO getUser(UUID id) {
         User user = userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
@@ -71,7 +72,7 @@ public class UserService {
     public String hardDeleteUser(UUID id) {
         User user = getUserEntity(id);
         userRepository.delete(user);
-        return "User removed successfully";
+        return "User deleted successfully";
     }
     
     
