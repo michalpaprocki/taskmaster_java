@@ -4,15 +4,10 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.mike.taskmaster.entity.User;
 import com.mike.taskmaster.entity.Task.Status;
-import com.mike.taskmaster.service.UserService;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -24,24 +19,22 @@ import static com.mike.taskmaster.dto.TaskRequestDTO.TITLE_MIN_MSG;
 import static com.mike.taskmaster.dto.TaskRequestDTO.TITLE_REQUIRED_MSG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 public class TaskRequestDTOTest {
      
     private Validator validator;
     private User jane;
 
-    @Autowired
-    UserService userService;
-
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        UserRequestDTO userDto = new UserRequestDTO("jane", "jane@example.com", "MySecr3tPassw0rd", null);
-        this.jane = userService.createUser(userDto);
-
+        // UserRequestDTO userDto = new UserRequestDTO("jane", "jane@example.com", "MySecr3tPassw0rd", null);
+        
+        this.jane = new User();
+        jane.setName("jane");
+        jane.setEmail("jane@example.com");
+        jane.setPassword("MySecr3tPasswr0d");
+        jane.setIsDeleted(false);
     }
 
     @Test

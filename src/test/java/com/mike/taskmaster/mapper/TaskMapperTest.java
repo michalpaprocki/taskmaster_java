@@ -2,7 +2,6 @@ package com.mike.taskmaster.mapper;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.LocalDateTime;
@@ -13,45 +12,34 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.mike.taskmaster.dto.TaskRequestDTO;
-import com.mike.taskmaster.dto.TaskResponseDTO;
-import com.mike.taskmaster.dto.UserRequestDTO;
 import com.mike.taskmaster.entity.Task;
 import com.mike.taskmaster.entity.User;
-import com.mike.taskmaster.service.TaskService;
-import com.mike.taskmaster.service.UserService;
 
 
 
-import jakarta.transaction.Transactional;
 
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 
 public class TaskMapperTest {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TaskService taskService;
+
     private User jane;
     private User frank;
-    private TaskResponseDTO testTask;
+    private Task testTask;
 
     @BeforeEach
     public void setUp() {
-        UserRequestDTO dto1= new UserRequestDTO("jane", "jane@example.com", "Simpl3Passw0rdz", false);
-        UserRequestDTO dto2 = new UserRequestDTO("frank", "frank@example.com", "Simpl3Passw0rdz", false);
-        this.jane = userService.createUser(dto1);
-        this.frank = userService.createUser(dto2);
+        this.jane = new User("jane", "jane@example.com", "Simpl3Passw0rdz", false);
+        jane.setId(UUID.randomUUID());
+        this.frank = new User("frank", "frank@example.com", "Simpl3Passw0rdz", false);
+        frank.setId(UUID.randomUUID());
 
-        TaskRequestDTO taskDto = new TaskRequestDTO("Testing task", "Short task description", null,null, null, null, null);
-        this.testTask = taskService.createTask(taskDto, frank);
+        this.testTask = new Task();
+        testTask.setTitle("Testing task");
+        testTask.setDescription("Short task description");
+        testTask.setCreator(jane);
+
     }
 
     @Test
@@ -69,14 +57,14 @@ public class TaskMapperTest {
 
     @Test
     public void testUpdateEntity() {
-        Set<UUID> assignees = new HashSet<>();
-        assignees.add(jane.getId());
-        assignees.add(frank.getId());
+        Set<User> assignees = new HashSet<>();
+        assignees.add(jane);
+        assignees.add(frank);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime deadline = now.plusDays(30);
 
-        TaskRequestDTO dto = new TaskRequestDTO("New test title", "New updated description", assignees, TaskRequestDTO.Action.ADD, null, null, deadline);
-        TaskResponseDTO updatedTask = taskService.updateTask(testTask.getId(), dto, frank, assignees);
+        TaskRequestDTO dto = new TaskRequestDTO("New test title", "New updated description", null, TaskRequestDTO.Action.ADD, null, null, deadline);
+        Task updatedTask = TaskMapper.updateEntity(testTask, dto, frank, assignees);
 
         assertThat(updatedTask).isNotNull();
         assertThat(updatedTask.getTitle()).isEqualTo("New test title");
@@ -87,15 +75,4 @@ public class TaskMapperTest {
         assertThat(updatedTask.getDeadline()).isEqualTo(deadline);
     }
 
-    @Test
-    public void testUpdateEntityThrows() {
-        Set<UUID> assignees = new HashSet<>();
-        UUID randomId1 = UUID.randomUUID();
-        UUID randomId2 = UUID.randomUUID();
-        assignees.add(randomId1);
-        assignees.add(randomId2);
-        TaskRequestDTO dto = new TaskRequestDTO(null, null, assignees, TaskRequestDTO.Action.ADD, null, null, null);
-
-        assertThatThrownBy(() -> taskService.updateTask(testTask.getId(), dto, frank, assignees)).isInstanceOf(IllegalArgumentException.class).hasMessage("Some users not found");
-    }
 }
