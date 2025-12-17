@@ -42,7 +42,8 @@ public class Task {
     @JoinTable(
         name = "user_tasks",
         joinColumns = @JoinColumn(name = "task_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
+        inverseJoinColumns = @JoinColumn(name = "user_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"task_id", "user_id"})
     )
     private Set<User> assignees = new HashSet<>();
 
