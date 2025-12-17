@@ -6,10 +6,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mike.taskmaster.entity.Task;
 import com.mike.taskmaster.entity.User;
 import com.mike.taskmaster.entity.Task.Status;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskResponseDTO {
     private UUID id;
     private String title;
