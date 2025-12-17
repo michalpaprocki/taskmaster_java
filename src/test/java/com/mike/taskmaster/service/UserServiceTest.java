@@ -68,6 +68,12 @@ public class UserServiceTest {
     }
 
     @Test
+    void testDuplicateNameThrows() {
+        UserRequestDTO dto = new UserRequestDTO(jane.getName(), "tony@example.com", jane.getPassword(),null);
+        assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Name already taken");
+    }
+
+    @Test
     void testGetUser() {
         User user = userService.getUserEntity(jane.getId());
         assertThat(user).isNotNull();
