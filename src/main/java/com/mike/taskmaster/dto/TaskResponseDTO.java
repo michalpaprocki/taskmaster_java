@@ -22,6 +22,7 @@ public class TaskResponseDTO {
     private LocalDateTime deadline;
     private boolean isDeleted;
 
+    public TaskResponseDTO() {}
     public TaskResponseDTO(Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
