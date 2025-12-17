@@ -29,7 +29,7 @@ public class TaskMapper {
         return task;
     }
 
-    public static void updateEntity(Task task, TaskRequestDTO dto, User creator, Set<User> assignees) {
+    public static Task updateEntity(Task task, TaskRequestDTO dto, User creator, Set<User> assignees) {
         if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
@@ -57,5 +57,6 @@ public class TaskMapper {
            
         task.setIsDeleted(dto.getIsDeleted());
         
+        return task;
     }
 }
