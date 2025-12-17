@@ -8,4 +8,5 @@ import com.mike.taskmaster.entity.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
+    boolean existsByName(String name);
 }
