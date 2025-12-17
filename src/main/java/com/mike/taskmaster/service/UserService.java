@@ -33,7 +33,7 @@ public class UserService {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new IllegalArgumentException("Email already taken");
         }
-        if (userRepository.existsByName(userDto.getEmail())) {
+        if (userRepository.existsByName(userDto.getName())) {
             throw new IllegalArgumentException("Name already taken");
         }
         return userRepository.save(UserMapper.toEntity(userDto));
