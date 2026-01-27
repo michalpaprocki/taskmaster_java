@@ -52,6 +52,9 @@ public class User {
     @ManyToMany(mappedBy = "assignees", cascade = CascadeType.PERSIST)
     private List<Task> tasks;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
+
     private boolean isDeleted;
     private LocalDateTime deletedAt;
 
@@ -142,4 +145,7 @@ public class User {
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
+
+    public RefreshToken getRefreshToken() { return refreshToken; }
+    public void setRefreshToken(RefreshToken refreshToken) { this.refreshToken = refreshToken; }
 }
