@@ -44,10 +44,8 @@ public class UserServiceTest {
 
     @BeforeEach
     void cleanAndSetupDb(){
-
+  
         UserRequestDTO janeDTO = new UserRequestDTO("jane", "jane@example.com", "Amazing", null);
-
-        
         this.jane = userService.createUser(janeDTO);
     }
 
@@ -59,19 +57,21 @@ public class UserServiceTest {
         assertThat(user.getName()).isEqualTo("tony");
         assertThat(user.getEmail()).isEqualTo("tony@example.com");
         assertThat(userRepository.existsById(user.getId())).isTrue();
+        assertNotEquals(dto.getPassword(), user.getPassword());
+        assertTrue(passwordEncoder.matches(dto.getPassword(), user.getPassword()));
     }
+    // redundant since switched from manual to db constraints
+    // @Test
+    // void testDuplicateEmailThrows() {
+    //     UserRequestDTO dto = new UserRequestDTO("tony", jane.getEmail(), jane.getPassword(),null);
+    //     assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Email or name already taken");
+    // }
 
-    @Test
-    void testDuplicateEmailThrows() {
-        UserRequestDTO dto = new UserRequestDTO("tony", jane.getEmail(), jane.getPassword(),null);
-        assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Email already taken");
-    }
-
-    @Test
-    void testDuplicateNameThrows() {
-        UserRequestDTO dto = new UserRequestDTO(jane.getName(), "tony@example.com", jane.getPassword(),null);
-        assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Name already taken");
-    }
+    // @Test
+    // void testDuplicateNameThrows() {
+    //     UserRequestDTO dto = new UserRequestDTO(jane.getName(), "tony@example.com", jane.getPassword(),null);
+    //     assertThatThrownBy(()-> userService.createUser(dto)).isInstanceOf(IllegalArgumentException.class).hasMessage("Email or name already taken");
+    // }
 
     @Test
     void testGetUser() {
@@ -113,6 +113,8 @@ public class UserServiceTest {
         assertThat(user.getIsDeleted()).isEqualTo(true);
         assertThat(user.getDeletedAt()).isInstanceOf(LocalDateTime.class);
     }
+
+    @Test
     void testUserHardDelete() {
         String responseString = userService.hardDeleteUser(jane.getId());
         assertThat(responseString).isEqualTo("User deleted successfully");
