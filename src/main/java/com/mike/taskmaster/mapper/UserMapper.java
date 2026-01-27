@@ -1,5 +1,8 @@
 package com.mike.taskmaster.mapper;
 
+import java.util.Collections;
+
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.mike.taskmaster.dto.UserRequestDTO;
@@ -19,13 +22,21 @@ public class UserMapper {
         );
     }
 
-    public static User toEntity(UserRequestDTO dto) {
+    public static User toEntity(UserRequestDTO dto, PasswordEncoder passwordEncoder) {
         User user = new User();
         user.setName(dto.getName());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setEmail(dto.getEmail());
         user.setIsDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false);
         return user;
+    }
+
+     public static UserDetails fromUserResponseDTO(UserResponseDTO dto) {
+        return new org.springframework.security.core.userdetails.User(
+            dto.getEmail(),
+            dto.getName(),
+            Collections.emptyList()
+        );
     }
 
     public static void updateEntity(User user, UserRequestDTO dto, PasswordEncoder passwordEncoder) {
