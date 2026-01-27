@@ -30,13 +30,7 @@ public class UserService {
     }
 
     public User createUser(UserRequestDTO userDto) {
-        if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new IllegalArgumentException("Email already taken");
-        }
-        if (userRepository.existsByName(userDto.getName())) {
-            throw new IllegalArgumentException("Name already taken");
-        }
-        return userRepository.save(UserMapper.toEntity(userDto));
+        return userRepository.save(UserMapper.toEntity(userDto, passwordEncoder));
     }
     public UserResponseDTO getUser(UUID id) {
         User user = userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
@@ -75,6 +69,11 @@ public class UserService {
         return "User deleted successfully";
     }
     
-    
-
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+        if(!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+        return user;
+    }
 }
