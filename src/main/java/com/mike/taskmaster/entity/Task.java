@@ -3,10 +3,11 @@ package com.mike.taskmaster.entity;
 import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
-
+// TODO: add not null and unique constriants + task / org relation
 
 @Entity
 @Table(name = "tasks")
@@ -30,6 +31,7 @@ public class Task {
     @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false, unique = true)
     private String title;
 
     private String description;
@@ -103,10 +105,10 @@ public class Task {
     public void setCreator(User creator) {
         this.creator = creator;
     }
-    public void addAssignees(Set<User> assignees) {
+    public void addAssignees(List<User> assignees) {
         this.assignees.addAll(assignees);
     }
-    public void removeAssignees(Set<User> assignees) {
+    public void removeAssignees(List<User> assignees) {
         this.assignees.removeAll(assignees);
     }
     public void setStatus(Status status) {
