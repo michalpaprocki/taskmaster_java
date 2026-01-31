@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,15 +50,15 @@ public class TaskServiceTest {
         this.jane = userService.createUser(dtoJane);
         this.frank = userService.createUser(dtoFrank);
         TaskRequestDTO taskDto = new TaskRequestDTO("mockup task title", "mockup task decription", null, TaskRequestDTO.Action.ADD, false, Status.PENDING, null);
-   
-        this.mockupTask = taskService.createTask(taskDto, jane);
+        List<User> assignees = new ArrayList<>();
+        this.mockupTask = taskService.createTask(taskDto, jane, assignees);
     }
 
     @Test
     void testCreateTask() {
         TaskRequestDTO dto = new TaskRequestDTO("test task", "Some description for testing", null, TaskRequestDTO.Action.ADD, false, Status.PENDING, null);
-   
-        TaskResponseDTO task = taskService.createTask(dto, frank);
+        List<User> assignees = new ArrayList<>();
+        TaskResponseDTO task = taskService.createTask(dto, frank, assignees);
 
         assertThat(task).isNotNull();
         assertThat(task.getTitle()).isEqualTo(dto.getTitle());
@@ -78,7 +80,7 @@ public class TaskServiceTest {
     @Test
     void testUpdateTask() {
         LocalDateTime now = LocalDateTime.now();
-        Set<UUID> assignees = new HashSet<>();
+        List<UUID> assignees = new ArrayList<>();
         assignees.add(frank.getId());
         TaskRequestDTO dto = new TaskRequestDTO("my new testing title", "Just a new description", null, TaskRequestDTO.Action.ADD, true, Task.Status.CANCELED, now);
         TaskResponseDTO task = taskService.updateTask(mockupTask.getId(), dto, jane, assignees);
