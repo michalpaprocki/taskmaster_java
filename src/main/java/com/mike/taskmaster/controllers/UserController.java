@@ -1,5 +1,6 @@
 package com.mike.taskmaster.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import com.mike.taskmaster.exception.JwtValidationException;
 import com.mike.taskmaster.security.jwt.JwtTokenProvider;
 import com.mike.taskmaster.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,4 +43,12 @@ public class UserController {
 
             return ResponseEntity.ok(user);
         }
+
+    @Operation(summary = "Returns all the users")
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>>  getUsers() {
+        List<UserResponseDTO> dtos = userService.getAllUsers();
+        return ResponseEntity.ok().body(dtos);
+    }
+    
 }
