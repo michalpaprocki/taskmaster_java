@@ -16,7 +16,7 @@ import com.mike.taskmaster.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/tasks")
 public class TasksController {
     
 

@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/api/task")
+@RequestMapping("/task")
 public class TaskController {
     private final TaskService taskService;
     private final JwtTokenProvider jwtTokenProvider;
