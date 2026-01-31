@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +42,8 @@ public class OrganizationServiceTest {
     private User frank;
     private User cassandra;
     private OrganizationResponseDTO wayland;
-
+    private List<UUID> uuids;
+    private List<User> members;
     @BeforeEach
     void setUp() {
         UserRequestDTO dto1 = new UserRequestDTO("jane", "jane@example.com", "My_secr3t_password", null);
@@ -50,17 +53,21 @@ public class OrganizationServiceTest {
         this.frank = userService.createUser(dto2);
         this.cassandra = userService.createUser(dto3);
 
-        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("Wayland", null);
+        members.add(frank);
+        members.add(cassandra);
+        this.members= new ArrayList<>();
+        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("Wayland","my organization description", uuids, null);
    
-        this.wayland = organizationService.createOrganizationWithOwner(orgDto, jane);
+        this.wayland = organizationService.createOrganizationWithOwner(orgDto, jane, members);
     }
 
     @Test
     void testCreateOrganization() {
-        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("ACME", null);
-        OrganizationResponseDTO org = organizationService.createOrganizationWithOwner(orgDto, jane);
+        OrganizationRequestDTO orgDto = new OrganizationRequestDTO("ACME", "", uuids, null);
+        OrganizationResponseDTO org = organizationService.createOrganizationWithOwner(orgDto, jane, members);
         assertThat(org).isNotNull();
         assertThat(org.getName()).isEqualTo("ACME");
+        assertThat(org.getDescription()).isEqualTo("my organization description");
         assertThat(org.getMemberships()).filteredOn(m -> m.getRole() == Membership.Role.OWNER).extracting(MemberResponseDTO::getName).contains(jane.getName());
     }
 
@@ -116,9 +123,11 @@ public class OrganizationServiceTest {
 
     @Test
     void testUpdateName() {
-        OrganizationRequestDTO dtoReq = new OrganizationRequestDTO("Yutani", null);
+        
+        OrganizationRequestDTO dtoReq = new OrganizationRequestDTO("Yutani", "we don't want any description",uuids, null);
         OrganizationResponseDTO dto =  organizationService.updateName(wayland.getId(), dtoReq);
         assertThat(dto.getName()).isEqualTo("Yutani");
+        assertThat(dto.getDescription()).isEqualTo("we don't want any description");
     }
 
 }
