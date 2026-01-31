@@ -1,2 +1,0 @@
-ALTER TABLE organizations
-ALTER COLUMN name VARCHAR(255) NOT NULL;

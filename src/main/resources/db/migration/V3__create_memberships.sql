@@ -9,9 +9,3 @@ CREATE TABLE memberships (
     CONSTRAINT uc_user_org UNIQUE (user_id, organization_id)
 );
 
-DROP TABLE user_organizations;
-
-ALTER TABLE organizations DROP COLUMN owner_id;
-
-
-EXEC sp_rename 'tasks.master', 'creator', 'COLUMN';

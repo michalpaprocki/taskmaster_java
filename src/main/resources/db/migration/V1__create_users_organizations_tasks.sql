@@ -1,22 +1,22 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255) UNIQUE
+    name VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE organizations (
     id UUID PRIMARY KEY,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     owner_id UUID,
     FOREIGN KEY(owner_id) REFERENCES users(id)
 );
 
 CREATE TABLE tasks (
     id UUID PRIMARY KEY,
-    title VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
     desciption TEXT,
-    master_id UUID,
-    FOREIGN KEY(master_id) REFERENCES users(id)
+    creator_id UUID,
+    FOREIGN KEY(creator_id) REFERENCES users(id)
 );
 
 CREATE TABLE user_tasks (
