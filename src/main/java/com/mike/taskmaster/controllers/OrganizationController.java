@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/api/organizations")
+@RequestMapping("organization")
 public class OrganizationController {
     private final OrganizationService organizationService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -38,7 +38,7 @@ public class OrganizationController {
         this.userService = userService;
     }
     @Operation(summary = "Creates a new organization")
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<OrganizationResponseDTO> createOrganization(@CookieValue(name = "accessToken", required = false) String token, @RequestBody OrganizationRequestDTO dto) {
         UUID id = jwtTokenProvider.parseTokenForUUID(token);
         User user = userService.getUserEntity(id);
@@ -50,13 +50,12 @@ public class OrganizationController {
         return ResponseEntity.ok(org);
     }
 
-    @Operation(summary = "Returns all organizations")
-    @GetMapping
-    public ResponseEntity<List<OrganizationResponseDTO>> getAllOrganizations() {
-        List<OrganizationResponseDTO> dtos = organizationService.getAllOrganizations();
-        return ResponseEntity.ok().body(dtos);
+    @Operation(summary = "Returns an organization associated with provided id")
+    @GetMapping("{orgId}")
+    public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable UUID orgId) {
+        return ResponseEntity.ok().body(organizationService.getOrganization(orgId));
     }
-    // TODO: transform to request/invite flow - calls for a new domain entities and service
+            // TODO: transform to request/invite flow - calls for a new domain entities and service
     @Operation(summary = "Adds a user to the organization | will be transformed to request in future")
     @PostMapping("/{orgId}/members")
     public ResponseEntity<OrganizationResponseDTO> joinOrganization(@CookieValue(name = "accessToken", required = false) String token, @PathVariable UUID orgId) {
@@ -74,12 +73,5 @@ public class OrganizationController {
         OrganizationResponseDTO updatedOrg = organizationService.removeMember(orgId, user);
         return ResponseEntity.ok().body(updatedOrg);
     }
-
-    @Operation(summary = "Returns an organization associated with proviede id")
-    @GetMapping("{orgId}")
-    public ResponseEntity<OrganizationResponseDTO> getOrganization(@PathVariable UUID orgId) {
-        return ResponseEntity.ok().body(organizationService.getOrganization(orgId));
-    }
-    
     
 }
