@@ -4,11 +4,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.mike.taskmaster.repository.UserRepository;
 
@@ -39,11 +42,15 @@ public class UserService {
     public User getUserEntity(UUID id) {
         return userRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
     }
-    public Set<User> getUserEntities(Set<UUID> ids) {
+    public List<User> getUsersEntities(List<UUID> ids) {
+        return userRepository.findAllById(ids);
+    }
+    public List<User> getUserEntities(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
-        return new HashSet<>(userRepository.findAllById(ids));
+        List<User> users = userRepository.findAllById(ids);
+        return users;
     }
     public String getEmail(UUID id) {
         return getUser(id).getEmail();
@@ -75,5 +82,11 @@ public class UserService {
             throw new IllegalArgumentException("Invalid email or password");
         }
         return user;
+    }
+
+    public List<UserResponseDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserResponseDTO> dtos = users.stream().map(user ->  UserMapper.toResponse(user)).collect(Collectors.toList());
+        return dtos;
     }
 }
