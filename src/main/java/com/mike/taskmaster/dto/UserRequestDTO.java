@@ -38,7 +38,7 @@ public class UserRequestDTO {
         this.name = name;
         this.email = email;
         this.password = password;
-            this.isDeleted = isDeleted != null ? isDeleted : false;
+        this.isDeleted = isDeleted != null ? isDeleted : false;
     }
 
     public String getName() {

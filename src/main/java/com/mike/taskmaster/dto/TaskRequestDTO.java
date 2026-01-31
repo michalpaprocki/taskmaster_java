@@ -2,7 +2,8 @@ package com.mike.taskmaster.dto;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
+
 import java.util.UUID;
 
 import com.mike.taskmaster.entity.Task.Status;
@@ -29,7 +30,7 @@ public class TaskRequestDTO {
     @Size(min = 12, message = DESCRIPTION_MIN_MSG)
     private String description;
 
-    private Set<UUID> assignees;
+    private List<UUID> assignees;
 
     private Action DTOAction;
 
@@ -39,10 +40,10 @@ public class TaskRequestDTO {
 
     private LocalDateTime deadline;
 
-    public TaskRequestDTO(String title, String description, Set<UUID> assignees, TaskRequestDTO.Action action, Boolean isDeleted, Status status, LocalDateTime deadline) {
+    public TaskRequestDTO(String title, String description, List<UUID> assignees, TaskRequestDTO.Action action, Boolean isDeleted, Status status, LocalDateTime deadline) {
         this.title = title;
         this.description = description;
-        this.assignees = assignees != null ? assignees : Collections.emptySet();
+        this.assignees = assignees != null ? assignees : Collections.emptyList();
         this.isDeleted = isDeleted != null ? isDeleted : false;
         if (status != null) {
             this.status = status;
@@ -59,7 +60,7 @@ public class TaskRequestDTO {
     public void setDescription(String description) {
         this.description = description;
     }
-    public void setAssignees(Set<UUID> assignees) {
+    public void setAssignees(List<UUID> assignees) {
         this.assignees = assignees;
     }
     public void setDTOAction(Action action){
@@ -80,7 +81,7 @@ public class TaskRequestDTO {
     public String getDescription() {
         return description;
     }
-    public Set<UUID> getAssignees() {
+    public List<UUID> getAssignees() {
         return assignees;
     }
     public Action getDTOAction() {
