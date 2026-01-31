@@ -1,5 +1,6 @@
 package com.mike.taskmaster.service;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.mike.taskmaster.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import com.mike.taskmaster.dto.ChangePasswordRequestDTO;
 import com.mike.taskmaster.dto.UserRequestDTO;
 import com.mike.taskmaster.dto.UserResponseDTO;
 import com.mike.taskmaster.entity.User;
@@ -86,5 +88,17 @@ public class UserService {
         List<User> users = userRepository.findAll();
         List<UserResponseDTO> dtos = users.stream().map(user ->  UserMapper.toResponse(user)).collect(Collectors.toList());
         return dtos;
+    }
+    public void changePassword(UUID id, ChangePasswordRequestDTO dto) {
+        User user = getUserEntity(id);
+
+       if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())){
+
+        throw new BadCredentialsException("Current password is incorrect");
+       }
+       
+       user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+       userRepository.save(user);
+        
     }
 }
