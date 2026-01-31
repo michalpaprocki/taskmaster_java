@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mike.taskmaster.dto.TaskRequestDTO;
 import com.mike.taskmaster.entity.Task;
+import com.mike.taskmaster.entity.Task.Status;
 import com.mike.taskmaster.entity.User;
 
 
@@ -27,14 +30,15 @@ public class TaskMapperTest {
     private User jane;
     private User frank;
     private Task testTask;
-
+    List<UUID> uuids = new ArrayList<>();
+    List<User> assignees = new ArrayList<>();
     @BeforeEach
     public void setUp() {
         this.jane = new User("jane", "jane@example.com", "Simpl3Passw0rdz", false);
         jane.setId(UUID.randomUUID());
         this.frank = new User("frank", "frank@example.com", "Simpl3Passw0rdz", false);
         frank.setId(UUID.randomUUID());
-
+        this.assignees.add(frank);
         this.testTask = new Task();
         testTask.setTitle("Testing task");
         testTask.setDescription("Short task description");
@@ -44,9 +48,9 @@ public class TaskMapperTest {
 
     @Test
     public void testToEntity() {
-        Set<User> assignees = new HashSet<>();
-        assignees.add(frank);
-        TaskRequestDTO dto = new TaskRequestDTO("test title", "some task description", Collections.singleton(frank.getId()), null, null, null, null);
+  
+
+        TaskRequestDTO dto = new TaskRequestDTO("test title", "some task description", uuids, null, null, null, null);
         Task mappedTask = TaskMapper.toEntity(dto, jane, assignees);
         assertThat(mappedTask).isNotNull();
         assertThat(mappedTask.getAssignees()).extracting(a -> a.getName(), a -> a.getEmail()).contains(tuple("frank", "frank@example.com"));
@@ -57,9 +61,9 @@ public class TaskMapperTest {
 
     @Test
     public void testUpdateEntity() {
-        Set<User> assignees = new HashSet<>();
+
         assignees.add(jane);
-        assignees.add(frank);
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime deadline = now.plusDays(30);
 

@@ -1,7 +1,8 @@
 package com.mike.taskmaster.mapper;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
+
 
 import com.mike.taskmaster.dto.TaskRequestDTO;
 import com.mike.taskmaster.dto.TaskResponseDTO;
@@ -16,7 +17,7 @@ public class TaskMapper {
         return new TaskResponseDTO(task);
     }
 
-    public static Task toEntity(TaskRequestDTO dto, User creator, Set<User> assignees) {
+    public static Task toEntity(TaskRequestDTO dto, User creator, List<User> assignees) {
         Task task = new Task();
         task.setDescription(dto.getDescription());
         task.setTitle(dto.getTitle());
@@ -24,12 +25,12 @@ public class TaskMapper {
         task.setDeadline(dto.getDeadline());
         task.setStatus(dto.getStatus());
         task.setIsDeleted(dto.getIsDeleted());
-        Set<User> safeAssignees = assignees != null ? assignees : Collections.emptySet();
+        List<User> safeAssignees = assignees != null ? assignees : Collections.emptyList();
         task.addAssignees(safeAssignees);
         return task;
     }
 
-    public static Task updateEntity(Task task, TaskRequestDTO dto, User creator, Set<User> assignees) {
+    public static Task updateEntity(Task task, TaskRequestDTO dto, User creator, List<User> assignees) {
         if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
