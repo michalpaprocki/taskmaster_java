@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("organization")
+@RequestMapping("/organization")
 public class OrganizationController {
     private final OrganizationService organizationService;
     private final JwtTokenProvider jwtTokenProvider;

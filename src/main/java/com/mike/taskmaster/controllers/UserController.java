@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
