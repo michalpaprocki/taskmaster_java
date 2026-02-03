@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
 
 import com.mike.taskmaster.dto.OrganizationRequestDTO;
@@ -18,7 +19,9 @@ import com.mike.taskmaster.mapper.OrganizationMapper;
 import com.mike.taskmaster.repository.OrganizationRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
+@Transactional
 @Service
 public class OrganizationService {
 
@@ -54,7 +57,8 @@ public class OrganizationService {
         Organization org = organizationRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Organization not found"));
         return new OrganizationResponseDTO(org);
     }
-
+    // TODO implement similar endpoint without members
+    @EntityGraph(attributePaths = "memberships")
     public List<OrganizationResponseDTO> getAllOrganizations() {
         List<Organization> orgs = organizationRepository.findAll();
         List<OrganizationResponseDTO> orgDtos = orgs.stream().map(org -> OrganizationMapper.toResponse(org)).collect(Collectors.toList());
