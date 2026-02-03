@@ -1,0 +1,4 @@
+ALTER TABLE users
+ADD is_deleted BIT NOT NULL DEFAULT 0;
+ALTER TABLE users
+ADD deleted_at DATETIME2 NULL;
