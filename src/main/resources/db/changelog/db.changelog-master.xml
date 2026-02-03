@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+   <changeSet id="1" author="mike">
+     <sqlFile path="V1__create_users_organizations_tasks.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+   <changeSet id="2" author="mike">
+     <sqlFile path="V2__add_role_and_password.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+   <changeSet id="3" author="mike">
+     <sqlFile path="V3__create_memberships.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+   <changeSet id="4" author="mike">
+     <sqlFile path="V4__add_isDeleted_users.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+   <changeSet id="5" author="mike">
+     <sqlFile path="V5__add_status_and_deadline_to_tasks.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+   <changeSet id="6" author="mike">
+     <sqlFile path="V6__create_refresh_token_table.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+   <changeSet id="7" author="mike">
+     <sqlFile path="V7__add_description_field_to_organizations.sql" relativeToChangelogFile="true"/>
+   </changeSet>
+
+</databaseChangeLog>
