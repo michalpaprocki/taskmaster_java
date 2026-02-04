@@ -25,5 +25,8 @@
    <changeSet id="7" author="mike">
      <sqlFile path="V7__add_description_field_to_organizations.sql" relativeToChangelogFile="true"/>
    </changeSet>
+   <changeSet id="8" author="mike">
+     <sqlFile path="V8__add_assigned_orgs_to_task.sql" relativeToChangelogFile="true"/>
+   </changeSet>
 
 </databaseChangeLog>

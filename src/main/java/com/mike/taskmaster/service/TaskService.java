@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.mike.taskmaster.dto.TaskRequestDTO;
 import com.mike.taskmaster.dto.TaskResponseDTO;
+import com.mike.taskmaster.entity.Organization;
 import com.mike.taskmaster.entity.Task;
 import com.mike.taskmaster.entity.User;
 import com.mike.taskmaster.mapper.TaskMapper;
@@ -19,17 +20,20 @@ public class TaskService {
     
     private final TaskRepository taskRepository;
     protected final UserService userService;
+    protected final OrganizationService organizationService;
 
-    public TaskService(TaskRepository taskRepository, UserService userService) {
+    public TaskService(TaskRepository taskRepository, UserService userService, OrganizationService organizationService) {
         this.taskRepository = taskRepository;
-        this.userService = userService;    }
+        this.userService = userService;
+        this.organizationService = organizationService;
+    }
 
-    public TaskResponseDTO createTask(TaskRequestDTO dto, User creator, List<User> assignees) {
+    public TaskResponseDTO createTask(TaskRequestDTO dto, User creator, List<User> assignees, List<Organization> orgs) {
         if (taskRepository.existsByTitle(dto.getTitle())){
             throw new IllegalArgumentException("Task name already taken");
         }
         
-        Task taskEntity = TaskMapper.toEntity(dto, creator, assignees);
+        Task taskEntity = TaskMapper.toEntity(dto, creator, assignees, orgs);
          return TaskMapper.toResponse(taskRepository.save(taskEntity));
     }
 
@@ -56,7 +60,7 @@ public class TaskService {
         }
     }
 
-    public TaskResponseDTO updateTask(UUID id, TaskRequestDTO dto, User creator, List<UUID> assignees) {
+    public TaskResponseDTO updateTask(UUID id, TaskRequestDTO dto, User creator, List<UUID> assignees, List<UUID> assignedOrganizations) {
         Task task = getTaskEntity(id);
         if (!isCreator(id, creator.getId())) {
             throw new IllegalArgumentException("Provided user is not creator of the task");
@@ -66,8 +70,13 @@ public class TaskService {
         if (users.size() != assignees.size()){
             throw new IllegalArgumentException("Some users not found");
         }
+        List<Organization> orgs = organizationService.getOrganizationEntities(assignedOrganizations);
 
-        TaskMapper.updateEntity(task, dto, creator, users);
+        if (orgs.size() != assignedOrganizations.size()){
+            throw new IllegalArgumentException("Some organizations not found");
+        }
+
+        TaskMapper.updateEntity(task, dto, creator, users, orgs);
         Task updatedTask = taskRepository.save(task);
         return new TaskResponseDTO(updatedTask);
     }

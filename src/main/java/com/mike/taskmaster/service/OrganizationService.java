@@ -70,6 +70,11 @@ public class OrganizationService {
         return org;
     }
 
+    public List<Organization> getOrganizationEntities(List<UUID> ids) {
+        List<Organization> orgs = organizationRepository.findAllById(ids);
+        return orgs;
+    }
+
 
     public boolean isOwner(UUID id, User user) {
         Organization org = getOrganizationEntity(id);

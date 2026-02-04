@@ -31,6 +31,8 @@ public class TaskRequestDTO {
     private String description;
 
     private List<UUID> assignees;
+    
+    private List<UUID> assignedOrganizations;
 
     private Action DTOAction;
 
@@ -40,10 +42,11 @@ public class TaskRequestDTO {
 
     private LocalDateTime deadline;
 
-    public TaskRequestDTO(String title, String description, List<UUID> assignees, TaskRequestDTO.Action action, Boolean isDeleted, Status status, LocalDateTime deadline) {
+    public TaskRequestDTO(String title, String description, List<UUID> assignees, List<UUID> assignedOrganizations, TaskRequestDTO.Action action, Boolean isDeleted, Status status, LocalDateTime deadline) {
         this.title = title;
         this.description = description;
         this.assignees = assignees != null ? assignees : Collections.emptyList();
+        this.assignedOrganizations = assignedOrganizations != null ? assignedOrganizations : Collections.emptyList();
         this.isDeleted = isDeleted != null ? isDeleted : false;
         if (status != null) {
             this.status = status;
@@ -62,6 +65,9 @@ public class TaskRequestDTO {
     }
     public void setAssignees(List<UUID> assignees) {
         this.assignees = assignees;
+    }
+    public void setAssignedOrganization(List<UUID> assignedOrganizations) {
+        this.assignedOrganizations = assignedOrganizations;
     }
     public void setDTOAction(Action action){
         this.DTOAction = action;
@@ -83,6 +89,10 @@ public class TaskRequestDTO {
     }
     public List<UUID> getAssignees() {
         return assignees;
+    }
+    
+    public List<UUID> getAssignedOrganizations() {
+        return assignedOrganizations;
     }
     public Action getDTOAction() {
         return DTOAction;

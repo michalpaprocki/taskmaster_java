@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mike.taskmaster.entity.Organization;
 import com.mike.taskmaster.entity.Task;
 import com.mike.taskmaster.entity.User;
 import com.mike.taskmaster.entity.Task.Status;
@@ -18,6 +19,7 @@ public class TaskResponseDTO {
     private String description;
     private User creator;
     private Set<User> assignees;
+    private Set<Organization> assignedOrganizations;
     private Status status;
     private LocalDateTime deadline;
     private boolean isDeleted;
@@ -29,6 +31,7 @@ public class TaskResponseDTO {
         this.description = task.getDescription();
         this.creator = task.getCreator();
         this.assignees = task.getAssignees();
+        this.assignedOrganizations = task.getAssignedOrganizations();
         this.deadline = task.getDeadline();
         this.isDeleted = task.getIsDeleted();
         this.status = task.getStatus();
@@ -48,6 +51,9 @@ public class TaskResponseDTO {
     }
     public void setAssignees(Set<User> assignees) {
         this.assignees = assignees;
+    }
+    public void setAssignedOrganizations(Set<Organization> assignedOrganizations) {
+        this.assignedOrganizations = assignedOrganizations;
     }
     public void setDeadline(LocalDateTime deadline) {
         this.deadline = deadline;
@@ -72,6 +78,9 @@ public class TaskResponseDTO {
     }
     public Set<UserResponseDTO> getAssignees() {
         return assignees.stream().map(a -> new UserResponseDTO(a)).collect(Collectors.toSet());
+    }
+    public Set<OrganizationResponseDTO> getAssignedOrganizations() {
+        return assignedOrganizations.stream().map(a -> new OrganizationResponseDTO(a)).collect(Collectors.toSet());
     }
     public LocalDateTime getDeadline() {
         return deadline;

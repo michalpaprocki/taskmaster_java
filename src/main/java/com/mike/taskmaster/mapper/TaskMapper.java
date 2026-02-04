@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.mike.taskmaster.dto.TaskRequestDTO;
 import com.mike.taskmaster.dto.TaskResponseDTO;
+import com.mike.taskmaster.entity.Organization;
 import com.mike.taskmaster.entity.Task;
 import com.mike.taskmaster.entity.User;
 
@@ -17,7 +18,7 @@ public class TaskMapper {
         return new TaskResponseDTO(task);
     }
 
-    public static Task toEntity(TaskRequestDTO dto, User creator, List<User> assignees) {
+    public static Task toEntity(TaskRequestDTO dto, User creator, List<User> assignees, List<Organization> assignedOrganizations) {
         Task task = new Task();
         task.setDescription(dto.getDescription());
         task.setTitle(dto.getTitle());
@@ -25,12 +26,14 @@ public class TaskMapper {
         task.setDeadline(dto.getDeadline());
         task.setStatus(dto.getStatus());
         task.setIsDeleted(dto.getIsDeleted());
+        List<Organization> safeOrganizations = assignedOrganizations != null ? assignedOrganizations : Collections.emptyList();
+        task.addAssignedOrganizations(safeOrganizations);
         List<User> safeAssignees = assignees != null ? assignees : Collections.emptyList();
         task.addAssignees(safeAssignees);
         return task;
     }
 
-    public static Task updateEntity(Task task, TaskRequestDTO dto, User creator, List<User> assignees) {
+    public static Task updateEntity(Task task, TaskRequestDTO dto, User creator, List<User> assignees, List<Organization> assignedOrganizations) {
         if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
@@ -45,6 +48,17 @@ public class TaskMapper {
 
                 case REMOVE:
                     task.getAssignees().removeAll(assignees);
+                break;
+            }
+        }
+        if (assignedOrganizations != null && dto.getDTOAction() != null) {
+            switch (dto.getDTOAction()) {
+                case ADD:
+                    task.getAssignedOrganizations().addAll(assignedOrganizations);
+                break;
+
+                case REMOVE:
+                    task.getAssignedOrganizations().removeAll(assignedOrganizations);
                 break;
             }
         }

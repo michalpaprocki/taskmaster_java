@@ -47,16 +47,16 @@ public class TaskServiceTest {
         UserRequestDTO dtoFrank = new UserRequestDTO("frank", "frank@example.com", "Amazing", null);
         this.jane = userService.createUser(dtoJane);
         this.frank = userService.createUser(dtoFrank);
-        TaskRequestDTO taskDto = new TaskRequestDTO("mockup task title", "mockup task decription", null, TaskRequestDTO.Action.ADD, false, Status.PENDING, null);
+        TaskRequestDTO taskDto = new TaskRequestDTO("mockup task title", "mockup task decription", null,  null,TaskRequestDTO.Action.ADD, false, Status.PENDING, null);
         List<User> assignees = new ArrayList<>();
-        this.mockupTask = taskService.createTask(taskDto, jane, assignees);
+        this.mockupTask = taskService.createTask(taskDto, jane, assignees, null);
     }
 
     @Test
     void testCreateTask() {
-        TaskRequestDTO dto = new TaskRequestDTO("test task", "Some description for testing", null, TaskRequestDTO.Action.ADD, false, Status.PENDING, null);
+        TaskRequestDTO dto = new TaskRequestDTO("test task", "Some description for testing", null, null, TaskRequestDTO.Action.ADD, false, Status.PENDING, null);
         List<User> assignees = new ArrayList<>();
-        TaskResponseDTO task = taskService.createTask(dto, frank, assignees);
+        TaskResponseDTO task = taskService.createTask(dto, frank, assignees, null);
 
         assertThat(task).isNotNull();
         assertThat(task.getTitle()).isEqualTo(dto.getTitle());
@@ -80,8 +80,8 @@ public class TaskServiceTest {
         LocalDateTime now = LocalDateTime.now();
         List<UUID> assignees = new ArrayList<>();
         assignees.add(frank.getId());
-        TaskRequestDTO dto = new TaskRequestDTO("my new testing title", "Just a new description", null, TaskRequestDTO.Action.ADD, true, Task.Status.CANCELED, now);
-        TaskResponseDTO task = taskService.updateTask(mockupTask.getId(), dto, jane, assignees);
+        TaskRequestDTO dto = new TaskRequestDTO("my new testing title", "Just a new description", null,null, TaskRequestDTO.Action.ADD, true, Task.Status.CANCELED, now);
+        TaskResponseDTO task = taskService.updateTask(mockupTask.getId(), dto, jane, assignees, null);
         assertThat(task).isNotNull();
         assertThat(task.getTitle()).isEqualTo(dto.getTitle());
         assertThat(task.getDescription()).isEqualTo(dto.getDescription());

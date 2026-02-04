@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mike.taskmaster.dto.TaskRequestDTO;
 import com.mike.taskmaster.dto.TaskResponseDTO;
+import com.mike.taskmaster.entity.Organization;
 import com.mike.taskmaster.entity.User;
 import com.mike.taskmaster.security.jwt.JwtTokenProvider;
 import com.mike.taskmaster.service.OrganizationService;
@@ -55,10 +56,10 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> create(@CookieValue(name = "accessToken", required = false) String token,  @RequestBody TaskRequestDTO dto) {
         UUID id = jwtTokenProvider.parseTokenForUUID(token);
         User user = userService.getUserEntity(id);
-
-
+   
+        List<Organization>  orgs = organizationService.getOrganizationEntities(dto.getAssignedOrganizations());
         List<User> members = userService.getUsersEntities(dto.getAssignees());
-        TaskResponseDTO task = taskService.createTask(dto, user, members);
+        TaskResponseDTO task = taskService.createTask(dto, user, members, orgs);
         
         return ResponseEntity.ok(task);
     }

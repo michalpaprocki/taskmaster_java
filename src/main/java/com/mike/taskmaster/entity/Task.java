@@ -49,6 +49,15 @@ public class Task {
     )
     private Set<User> assignees = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+        name = "organization_tasks",
+        joinColumns = @JoinColumn(name = "task_id"),
+        inverseJoinColumns = @JoinColumn(name = "organization_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"task_id", "organization_id"})
+    )
+    private Set<Organization> assignedOrganizations = new HashSet<>();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.PENDING;
@@ -87,6 +96,9 @@ public class Task {
     public Set<User> getAssignees() {
         return assignees;
     }
+    public Set<Organization> getAssignedOrganizations() {
+        return assignedOrganizations;
+    }
     public LocalDateTime getDeadline() {
         return deadline;
     }
@@ -108,8 +120,14 @@ public class Task {
     public void addAssignees(List<User> assignees) {
         this.assignees.addAll(assignees);
     }
+    public void addAssignedOrganizations(List<Organization> assignedOrganizations) {
+        this.assignedOrganizations.addAll(assignedOrganizations);
+    }
     public void removeAssignees(List<User> assignees) {
         this.assignees.removeAll(assignees);
+    }
+    public void removeAssignedOrganizations(List<Organization> assignedOrganizations) {
+        this.assignedOrganizations.removeAll(assignedOrganizations);
     }
     public void setStatus(Status status) {
         this.status = status;

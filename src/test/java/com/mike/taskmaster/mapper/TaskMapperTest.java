@@ -46,8 +46,8 @@ public class TaskMapperTest {
     public void testToEntity() {
   
 
-        TaskRequestDTO dto = new TaskRequestDTO("test title", "some task description", uuids, null, null, null, null);
-        Task mappedTask = TaskMapper.toEntity(dto, jane, assignees);
+        TaskRequestDTO dto = new TaskRequestDTO("test title", "some task description", uuids, null, null, null, null, null);
+        Task mappedTask = TaskMapper.toEntity(dto, jane, assignees, null);
         assertThat(mappedTask).isNotNull();
         assertThat(mappedTask.getAssignees()).extracting(a -> a.getName(), a -> a.getEmail()).contains(tuple("frank", "frank@example.com"));
         assertThat(mappedTask.getCreator()).isEqualTo(jane);
@@ -63,8 +63,8 @@ public class TaskMapperTest {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime deadline = now.plusDays(30);
 
-        TaskRequestDTO dto = new TaskRequestDTO("New test title", "New updated description", null, TaskRequestDTO.Action.ADD, null, null, deadline);
-        Task updatedTask = TaskMapper.updateEntity(testTask, dto, frank, assignees);
+        TaskRequestDTO dto = new TaskRequestDTO("New test title", "New updated description", null, null, TaskRequestDTO.Action.ADD, null, null, deadline);
+        Task updatedTask = TaskMapper.updateEntity(testTask, dto, frank, assignees, null);
 
         assertThat(updatedTask).isNotNull();
         assertThat(updatedTask.getTitle()).isEqualTo("New test title");
