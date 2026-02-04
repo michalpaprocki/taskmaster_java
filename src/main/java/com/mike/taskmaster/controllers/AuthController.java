@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mike.taskmaster.dto.UserRequestDTO;
+import com.mike.taskmaster.dto.UserResponseDTO;
 import com.mike.taskmaster.entity.RefreshToken;
 import com.mike.taskmaster.entity.User;
+import com.mike.taskmaster.mapper.UserMapper;
 import com.mike.taskmaster.security.jwt.JwtProperties;
 import com.mike.taskmaster.security.jwt.JwtTokenProvider;
 import com.mike.taskmaster.service.RefreshTokenService;
@@ -27,6 +29,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+
 
 
 @RestController
@@ -47,19 +50,19 @@ public class AuthController {
     
     @Operation(summary = "Registers users and emits jwt token")
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody UserRequestDTO dto, HttpServletResponse response) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRequestDTO dto, HttpServletResponse response) {
 
             User user = userService.createUser(dto);
 
-            return respondWithTokens(response, user);
+            return respondWithTokens(response, user, UserMapper.toResponse(user));
         }
   
     @Operation(summary = "Logs in users and returns jwt token")
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody UserRequestDTO dto, HttpServletResponse response) {
+    public ResponseEntity<UserResponseDTO> login(@RequestBody UserRequestDTO dto, HttpServletResponse response) {
         User user = userService.login(dto.getEmail(), dto.getPassword());
 
-        return respondWithTokens(response, user);
+        return respondWithTokens(response, user, UserMapper.toResponse(user));
         }
   
 
@@ -83,7 +86,7 @@ public class AuthController {
             return ResponseEntity.status(401).build();
         }
 
-        return respondWithTokens(response, refreshToken.getUser());
+        return respondWithTokens(response, refreshToken.getUser(), null);
 
 
     }
@@ -128,10 +131,12 @@ public class AuthController {
     }
 
     @Transactional
-    private ResponseEntity<Void> respondWithTokens(HttpServletResponse response, User user)  {
+    private <T> ResponseEntity<T> respondWithTokens(HttpServletResponse response, User user, T body)  {
+
         refreshTokenService.removeTokenByUser(user);
         String newJwt = jwtTokenProvider.generateToken(user);
         String newRefreshTokenValue = refreshTokenService.createOrReplaceRefreshToken(user);
+
         ResponseCookie jwtCookie = ResponseCookie.from("accessToken", newJwt)
                 .httpOnly(true)
                 .secure(jwtProperties.isSecure())
@@ -147,10 +152,10 @@ public class AuthController {
                 .maxAge(jwtProperties.getRefreshExpiration() / 1000)
                 .build();
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .build();
+            return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .body(body);
     }
     private Optional<String> extractRefreshToken(HttpServletRequest request) {
         if (request.getCookies() !=null) {
